@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Chat</title>
+  <link rel="stylesheet" href="index.css">
+  
+</head>
+
+<body>
+
+  <div class="chat-container">
+
+    <div class="chat-header">
+      AI Chat
+    </div>
+
+    <div class="chat-box" id="chatBox"></div>
+
+    <div class="chat-input">
+      <input
+        type="text"
+        id="messageInput"
+        placeholder="Type your message..."
+      />
+
+      <button onclick="sendMessage()">
+        Send
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("messageInput");
+      const chatBox = document.getElementById("chatBox");
+
+      const message = input.value.trim();
+
+      if (!message) return;
+
+      // User message
+      const userDiv = document.createElement("div");
+      userDiv.className = "message user";
+      userDiv.innerText = message;
+      chatBox.appendChild(userDiv);
+
+      input.value = "";
+
+      // Call Express API
+      const response = await fetch("http://localhost:3000/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          prompt: message
+        })
+      });
+
+      const data = await response.json();
+
+      // Bot message
+      const botDiv = document.createElement("div");
+      botDiv.className = "message bot";
+      botDiv.innerText = data.result;
+
+      chatBox.appendChild(botDiv);
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+
+</body>
+</html>
