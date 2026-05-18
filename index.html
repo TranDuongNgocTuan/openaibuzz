@@ -3,48 +3,152 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Chat</title>
+  <title>Eyes + Chat</title>
   <link rel="stylesheet" href="index.css">
-  
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css">
 </head>
 
 <body>
 
-  <div class="chat-container">
+  <div class="wrapper">
 
-    <div class="chat-header">
-      AI Chat
+    <!-- EYES -->
+    <div class="container">
+
+      <div class="face">
+
+        <div class="eye">
+          <div class="pupil"></div>
+        </div>
+
+        <div class="eye">
+          <div class="pupil"></div>
+        </div>
+
+      </div>
+
     </div>
 
-    <div class="chat-box" id="chatBox"></div>
+    <!-- CHAT -->
+    <div class="chat-container markdown-body">
 
-    <div class="chat-input">
-      <input
-        type="text"
-        id="messageInput"
-        placeholder="Type your message..."
-      />
+      <div class="chat-header">
+        AI Chat
+      </div>
 
-      <button onclick="sendMessage()">
-        Send
-      </button>
+      <div class="chat-box" id="chatBox">
+
+        <div class="message bot">
+          Hello 👀
+        </div>
+
+      </div>
+
+      <div class="chat-input">
+
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Type your message..."
+        />
+
+        <button onclick="sendMessage()">
+          Send
+        </button>
+
+      </div>
+
     </div>
 
   </div>
 
   <script>
+
+    // =========================
+    // EYES FOLLOW MOUSE
+    // =========================
+
+    const pupils = document.querySelectorAll(".pupil");
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+
+    document.addEventListener("mousemove", (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    function animateEyes() {
+
+      pupils.forEach((pupil) => {
+
+        const eye = pupil.parentElement;
+
+        const rect = eye.getBoundingClientRect();
+
+        const eyeX = rect.left + rect.width / 2;
+        const eyeY = rect.top + rect.height / 2;
+
+        const dx = mouseX - eyeX;
+        const dy = mouseY - eyeY;
+
+        const angle = Math.atan2(dy, dx);
+
+        const distance = Math.min(
+          18,
+          Math.hypot(dx, dy) * 0.08
+        );
+
+        const moveX = Math.cos(angle) * distance;
+        const moveY = Math.sin(angle) * distance;
+
+        pupil.style.transform =
+          `translate3d(
+            calc(-50% + ${moveX}px),
+            calc(-50% + ${moveY}px),
+            0
+          )`;
+
+      });
+
+      requestAnimationFrame(animateEyes);
+    }
+
+    animateEyes();
+
+    // =========================
+    // CHAT
+    // =========================
+
+    const input =
+      document.getElementById("messageInput");
+
+    input.addEventListener("keydown", (e) => {
+
+      if (e.key === "Enter") {
+        sendMessage();
+      }
+
+    });
+
     async function sendMessage() {
-      const input = document.getElementById("messageInput");
-      const chatBox = document.getElementById("chatBox");
+
+      const chatBox =
+        document.getElementById("chatBox");
 
       const message = input.value.trim();
 
       if (!message) return;
 
-      // User message
-      const userDiv = document.createElement("div");
+      // USER MESSAGE
+      const userDiv =
+        document.createElement("div");
+
       userDiv.className = "message user";
+
       userDiv.innerText = message;
+
       chatBox.appendChild(userDiv);
 
       input.value = "";
@@ -65,12 +169,13 @@
       // Bot message
       const botDiv = document.createElement("div");
       botDiv.className = "message bot";
-      botDiv.innerText = data.result;
+      botDiv.innerText = data.response;
 
       chatBox.appendChild(botDiv);
 
       chatBox.scrollTop = chatBox.scrollHeight;
     }
+
   </script>
 
 </body>
